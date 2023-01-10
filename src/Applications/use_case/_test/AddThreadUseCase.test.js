@@ -1,0 +1,6 @@
+
+describe('AddThreadUseCase', ()=>{
+  it('should ', ()=>{
+
+  });
+});

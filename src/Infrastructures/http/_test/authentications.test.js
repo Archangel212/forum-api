@@ -246,7 +246,7 @@ describe('/authentications endpoint', () => {
     it('should return 400 if refresh token not registered in database', async () => {
       // Arrange
       const server = await createServer(container);
-      const refreshToken = await container.getInstance(AuthenticationTokenManager.name).createRefreshToken({ username: 'dicoding' });
+      const refreshToken = await container.resolve('authenticationTokenManager').createRefreshToken({ username: 'dicoding' });
 
       // Action
       const response = await server.inject({

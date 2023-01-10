@@ -8,7 +8,7 @@ class UsersHandler {
   }
 
   async postUserHandler(request, h) {
-    const addUserUseCase = this._container.getInstance(AddUserUseCase.name);
+    const addUserUseCase = this._container.resolve('AddUserUseCase');
     const addedUser = await addUserUseCase.execute(request.payload);
 
     const response = h.response({

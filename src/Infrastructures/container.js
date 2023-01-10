@@ -1,6 +1,6 @@
 /* istanbul ignore file */
 
-const { createContainer } = require('instances-container');
+const awilix = require('awilix');
 
 // external agency
 const { nanoid } = require('nanoid');
@@ -25,133 +25,28 @@ const LogoutUserUseCase = require('../Applications/use_case/LogoutUserUseCase');
 const RefreshAuthenticationUseCase = require('../Applications/use_case/RefreshAuthenticationUseCase');
 
 // creating container
-const container = createContainer();
+const container = awilix.createContainer();
 
-// registering services and repository
-container.register([
-  {
-    key: UserRepository.name,
-    Class: UserRepositoryPostgres,
-    parameter: {
-      dependencies: [
-        {
-          concrete: pool,
-        },
-        {
-          concrete: nanoid,
-        },
-      ],
-    },
-  },
-  {
-    key: AuthenticationRepository.name,
-    Class: AuthenticationRepositoryPostgres,
-    parameter: {
-      dependencies: [
-        {
-          concrete: pool,
-        },
-      ],
-    },
-  },
-  {
-    key: PasswordHash.name,
-    Class: BcryptPasswordHash,
-    parameter: {
-      dependencies: [
-        {
-          concrete: bcrypt,
-        },
-      ],
-    },
-  },
-  {
-    key: AuthenticationTokenManager.name,
-    Class: JwtTokenManager,
-    parameter: {
-      dependencies: [
-        {
-          concrete: Jwt.token,
-        },
-      ],
-    },
-  },
-]);
+container.register({
+  pool: awilix.asValue(pool),
+  bcrypt: awilix.asValue(bcrypt),
+  jwt: awilix.asValue(Jwt.token),
+  idGenerator: awilix.asFunction(()=>nanoid),
+});
+
+container.register({
+  userRepository: awilix.asClass(UserRepositoryPostgres).classic(),
+  authenticationRepository: awilix.asClass(AuthenticationRepositoryPostgres).classic(),
+  passwordHash: awilix.asClass(BcryptPasswordHash).classic(),
+  authenticationTokenManager: awilix.asClass(JwtTokenManager).classic()
+});
 
 // registering use cases
-container.register([
-  {
-    key: AddUserUseCase.name,
-    Class: AddUserUseCase,
-    parameter: {
-      injectType: 'destructuring',
-      dependencies: [
-        {
-          name: 'userRepository',
-          internal: UserRepository.name,
-        },
-        {
-          name: 'passwordHash',
-          internal: PasswordHash.name,
-        },
-      ],
-    },
-  },
-  {
-    key: LoginUserUseCase.name,
-    Class: LoginUserUseCase,
-    parameter: {
-      injectType: 'destructuring',
-      dependencies: [
-        {
-          name: 'userRepository',
-          internal: UserRepository.name,
-        },
-        {
-          name: 'authenticationRepository',
-          internal: AuthenticationRepository.name,
-        },
-        {
-          name: 'authenticationTokenManager',
-          internal: AuthenticationTokenManager.name,
-        },
-        {
-          name: 'passwordHash',
-          internal: PasswordHash.name,
-        },
-      ],
-    },
-  },
-  {
-    key: LogoutUserUseCase.name,
-    Class: LogoutUserUseCase,
-    parameter: {
-      injectType: 'destructuring',
-      dependencies: [
-        {
-          name: 'authenticationRepository',
-          internal: AuthenticationRepository.name,
-        },
-      ],
-    },
-  },
-  {
-    key: RefreshAuthenticationUseCase.name,
-    Class: RefreshAuthenticationUseCase,
-    parameter: {
-      injectType: 'destructuring',
-      dependencies: [
-        {
-          name: 'authenticationRepository',
-          internal: AuthenticationRepository.name,
-        },
-        {
-          name: 'authenticationTokenManager',
-          internal: AuthenticationTokenManager.name,
-        },
-      ],
-    },
-  },
-]);
+container.register({
+  AddUserUseCase: awilix.asClass(AddUserUseCase),
+  LoginUserUseCase: awilix.asClass(LoginUserUseCase),
+  LogoutUserUseCase: awilix.asClass(LogoutUserUseCase),
+  RefreshAuthenticationUseCase: awilix.asClass(RefreshAuthenticationUseCase),
+});
 
 module.exports = container;
