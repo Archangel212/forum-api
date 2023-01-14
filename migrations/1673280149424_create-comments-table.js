@@ -6,6 +6,7 @@ exports.up = (pgm) => {
     content: {type: 'TEXT', notNull: true},
     date: {type: 'TIMESTAMP', notNull: true},
     owner: {type: 'VARCHAR(50)', notNull: true},
+    is_deleted: {type: 'BOOLEAN', notNull: true},
   });
 
   pgm.addConstraint('comments', 'fk_comments.owner_users.id',

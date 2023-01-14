@@ -3,7 +3,7 @@
 const awilix = require('awilix');
 
 // external agency
-const { nanoid } = require('nanoid');
+const {nanoid} = require('nanoid');
 const bcrypt = require('bcrypt');
 const Jwt = require('@hapi/jwt');
 const pool = require('./database/postgres/pool');
@@ -38,7 +38,7 @@ container.register({
   userRepository: awilix.asClass(UserRepositoryPostgres).classic(),
   authenticationRepository: awilix.asClass(AuthenticationRepositoryPostgres).classic(),
   passwordHash: awilix.asClass(BcryptPasswordHash).classic(),
-  authenticationTokenManager: awilix.asClass(JwtTokenManager).classic()
+  authenticationTokenManager: awilix.asClass(JwtTokenManager).classic(),
 });
 
 // registering use cases

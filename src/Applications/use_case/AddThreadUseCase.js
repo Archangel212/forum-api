@@ -1,13 +1,14 @@
 
 class AddThreadUseCase {
-  constructor({userRepository, authenticationRepository, threadRepository}) {
+  constructor({userRepository, threadRepository}) {
     this._userRepository = userRepository;
-    this._authenticationRepository = authenticationRepository;
     this._threadRepository = threadRepository;
   }
 
   async execute(useCasePayload) {
+    const {title, body} = useCasePayload;
 
+    await this._threadRepository.addThread({id, title, body, owner, comments});
   }
 }
 

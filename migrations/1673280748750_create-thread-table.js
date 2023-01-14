@@ -5,7 +5,7 @@ exports.up = (pgm) => {
     title: {type: 'TEXT', notNull: true},
     body: {type: 'TEXT', notNull: true},
     owner: {type: 'VARCHAR(50)', notNull: true},
-    comments: {type: 'VARCHAR(50)', notNull: true},
+    comments: {type: 'VARCHAR(50)', notNull: false},
   });
 
   pgm.addConstraint('threads', 'fk_threads.owner_users.id',
