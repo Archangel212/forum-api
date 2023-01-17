@@ -24,17 +24,6 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     return new Thread({...result.rows[0], body, comments});
   }
 
-  async addCommentToThread(threadId, commentId) {
-    const updateResult = await this._pool.query({
-      text: 'UPDATE threads SET comment_id = $1 WHERE id = $2',
-      values: [commentId, threadId],
-    });
-
-    if (!updateResult.rowCount) {
-      throw new InvariantError('komentar gagal ditambahkan ke dalam thread');
-    }
-  }
-
   async getThreadDetails(threadId) {
     const threadResult = await this._pool.query({
       text: `SELECT t.id, t.title, t.body, t.date_created AS date, u.username 
@@ -49,15 +38,24 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     }
 
     const threadCommentsResult = await this._pool.query({
-      text: `SELECT c.id, u.username, c.date, c.content FROM threads t
-            INNER JOIN comments c ON t.comment_id = c.id
+      text: `SELECT c.id, u.username, c.date, c.content FROM comments c
+            INNER JOIN threads t ON c.thread_id = t.id 
             INNER JOIN users u ON c.owner = u.id
             WHERE t.id = $1
-            `,
+            ORDER BY c.date`,
       values: [threadId],
     });
     console.log('getThreadDetails threadResult', threadResult.rows);
     console.log('getThreadDetails threadCommentsResult', threadCommentsResult.rows);
+
+    const returned = {
+      ...threadResult.rows[0],
+      comments: threadCommentsResult.rows,
+    };
+
+    console.log('getThreadDetails returned', returned);
+
+    return returned;
   }
 }
 

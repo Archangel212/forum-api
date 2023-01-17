@@ -8,19 +8,30 @@ class CommentRepositoryPostgres extends CommentRepository {
     this._idGenerator = idGenerator;
   }
 
-  async addComment({content, date, owner, isDeleted}) {
+  async addCommentToThread({content, date, owner, isDeleted, threadId}) {
     try {
       const id = `comment-${this._idGenerator()}`;
       const result = await this._pool.query({
-        text: 'INSERT INTO comments(id, content, date, owner, is_deleted) VALUES($1, $2, $3, $4, $5) RETURNING id, content, owner',
-        values: [id, content, date, owner, isDeleted],
+        text: 'INSERT INTO comments(id, content, date, owner, is_deleted, thread_id) VALUES($1, $2, $3, $4, $5, $6) RETURNING id, content, owner',
+        values: [id, content, date, owner, isDeleted, threadId],
       });
 
       return {...result.rows[0]};
     } catch (e) {
-      throw new InvariantError('komentar gagal ditambahkan');
+      // console.log(e);
+      throw new InvariantError('komentar gagal ditambahkan ke dalam thread');
     }
   }
+  // async addCommentToThread(threadId, commentId) {
+  //   const updateResult = await this._pool.query({
+  //     text: 'INSERT INTO comments ',
+  //     values: [commentId, threadId],
+  //   });
+
+  //   if (!updateResult.rowCount) {
+  //     throw new InvariantError('komentar gagal ditambahkan ke dalam thread');
+  //   }
+  // }
 
   async getCommentById(commentId) {
     const result = await this._pool.query({

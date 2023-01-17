@@ -1,16 +1,13 @@
 /* istanbul ignore file */
 const pool = require('../src/Infrastructures/database/postgres/pool');
-const UsersTableTestHelper = require('./UsersTableTestHelper');
 
 const ThreadsTableHelper = {
   async addThread({
-    id = 'thread-123', title = 'sample-thread', body = 'just a thread', dateCreated = new Date(), owner = 'user-123', commentId = 'comment-123',
+    id = 'thread-123', title = 'sample-thread', body = 'just a thread', dateCreated = new Date(), owner = 'user-123',
   }) {
-    // await UsersTableTestHelper.addUser({id: owner});
-
     const query = {
-      text: 'INSERT INTO threads VALUES($1, $2, $3, $4, $5, $6)',
-      values: [id, title, body, dateCreated, owner, commentId],
+      text: 'INSERT INTO threads VALUES($1, $2, $3, $4, $5)',
+      values: [id, title, body, dateCreated, owner],
     };
 
     await pool.query(query);
@@ -28,7 +25,7 @@ const ThreadsTableHelper = {
 
   async findCommentsInAThread(threadId) {
     const result = await pool.query({
-      text: 'SELECT comments.* FROM comments INNER JOIN threads ON comments.id = threads.comment_id WHERE threads.id = $1',
+      text: 'SELECT comments.* FROM comments INNER JOIN threads ON comments.thread_id = threads.id WHERE threads.id = $1',
       values: [threadId],
     });
 

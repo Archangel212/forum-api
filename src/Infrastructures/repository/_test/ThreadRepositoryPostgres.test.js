@@ -35,43 +35,26 @@ describe('ThreadRepositoryPostgres', () => {
     });
   });
 
-  describe('addCommentToThread function', ()=>{
-    it('should throw an error if the thread does not exist', async ()=>{
-      const threadId = 'thread-123';
-      const commentId = 'comment-123';
-      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
-
-      await expect(threadRepositoryPostgres.addCommentToThread(threadId, commentId)).rejects.toThrowError(InvariantError);
-    });
-
-    it('should add a comment to the appropriate thread', async ()=>{
-      await UsersTableTestHelper.addUser({id: 'user-123'});
-      await CommentsTableHelper.addComment({id: 'comment-123'});
-      await ThreadsTableHelper.addThread({id: 'thread-123'});
-      const expectedAddedComment = await CommentsTableHelper.findCommentById('comment-123');
-
-      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
-      await threadRepositoryPostgres.addCommentToThread('thread-123', 'comment-123');
-
-      const comments = await ThreadsTableHelper.findCommentsInAThread('thread-123');
-
-      console.log('comments', comments);
-      expect(expectedAddedComment).toEqual(comments[0]);
-    });
-  });
-
   describe('getThreadDetails function', ()=>{
     it('should return thread details correctly', async ()=>{
       await UsersTableTestHelper.addUser({id: 'user-123'});
-      await CommentsTableHelper.addComment({id: 'comment-123'});
       await ThreadsTableHelper.addThread({id: 'thread-123'});
+      await CommentsTableHelper.addComment({id: 'comment-123'});
       const fakeIdGenerator = () => '123';
 
       await UsersTableTestHelper.addUser({id: 'user-456', username: 'ujang'});
-      await CommentsTableHelper.addComment({id: 'comment-456', content: 'another comment', isDeleted: true});
+      await CommentsTableHelper.addComment({id: 'comment-456', content: 'another comment', isDeleted: true, owner: 'user-456'});
 
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
-      await threadRepositoryPostgres.getThreadDetails('thread-123');
+      const threadDetails = await threadRepositoryPostgres.getThreadDetails('thread-123');
+
+      expect(threadDetails).toHaveProperty('id');
+      expect(threadDetails).toHaveProperty('title');
+      expect(threadDetails).toHaveProperty('body');
+      expect(threadDetails).toHaveProperty('date');
+      expect(threadDetails).toHaveProperty('username');
+      expect(threadDetails).toHaveProperty('comments');
+      expect(threadDetails.comments).toBeInstanceOf(Array);
     });
   });
 });
