@@ -22,16 +22,6 @@ class CommentRepositoryPostgres extends CommentRepository {
       throw new InvariantError('komentar gagal ditambahkan ke dalam thread');
     }
   }
-  // async addCommentToThread(threadId, commentId) {
-  //   const updateResult = await this._pool.query({
-  //     text: 'INSERT INTO comments ',
-  //     values: [commentId, threadId],
-  //   });
-
-  //   if (!updateResult.rowCount) {
-  //     throw new InvariantError('komentar gagal ditambahkan ke dalam thread');
-  //   }
-  // }
 
   async getCommentById(commentId) {
     const result = await this._pool.query({

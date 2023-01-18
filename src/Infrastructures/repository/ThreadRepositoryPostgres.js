@@ -38,24 +38,31 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     }
 
     const threadCommentsResult = await this._pool.query({
-      text: `SELECT c.id, u.username, c.date, c.content FROM comments c
+      text: `SELECT c.id, u.username, c.date, c.content, c.is_deleted FROM comments c
             INNER JOIN threads t ON c.thread_id = t.id 
             INNER JOIN users u ON c.owner = u.id
             WHERE t.id = $1
             ORDER BY c.date`,
       values: [threadId],
     });
-    console.log('getThreadDetails threadResult', threadResult.rows);
-    console.log('getThreadDetails threadCommentsResult', threadCommentsResult.rows);
 
-    const returned = {
+    if (!threadCommentsResult.rowCount) {
+      throw new InvariantError('thread comments tidak ditemukan');
+    }
+
+    const threadDetails = {
       ...threadResult.rows[0],
-      comments: threadCommentsResult.rows,
+      comments: threadCommentsResult.rows.map((val, idx)=>{
+        if (val.is_deleted) {
+          val.content = '**komentar telah dihapus**';
+        }
+        delete val.is_deleted;
+        return val;
+      }),
     };
 
-    console.log('getThreadDetails returned', returned);
-
-    return returned;
+    console.log('getThreadDetails threadDetails', threadDetails);
+    return threadDetails;
   }
 }
 

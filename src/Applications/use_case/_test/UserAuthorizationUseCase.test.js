@@ -11,8 +11,9 @@ describe('UserAuthorizationUseCase', ()=>{
     expect(userAuthorizationUseCase.execute(useCasePayload)).rejects.toThrowError('USER_AUTHORIZATION.NOT_CONTAIN_ACCESS_TOKEN');
   });
 
-  it('should throw an error if the payload type is not valid', ()=>{
+  it('should throw an error if the payload data type is not valid', ()=>{
     const useCasePayload = {accessToken: 123};
+
     const userAuthorizationUseCase = new UserAuthorizationUseCase({}, {});
 
     expect(userAuthorizationUseCase.execute(useCasePayload)).rejects.toThrowError('USER_AUTHORIZATION.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION');
