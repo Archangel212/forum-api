@@ -10,7 +10,7 @@ class ThreadRepositoryPostgres extends ThreadRepository {
   }
 
   async addThread(thread) {
-    const {title, body, owner, comments} = thread;
+    const {title, body, owner} = thread;
     const date = new Date();
     const id = `thread-${this._idGenerator()}`;
 
@@ -21,7 +21,12 @@ class ThreadRepositoryPostgres extends ThreadRepository {
 
     const result = await this._pool.query(query);
 
-    return new Thread({...result.rows[0], body, comments});
+    if (!result.rowCount) {
+      throw new InvariantError('gagal menambah thread');
+    }
+
+
+    return new Thread({...result.rows[0], body});
   }
 
   async getThreadDetails(threadId) {
@@ -52,7 +57,7 @@ class ThreadRepositoryPostgres extends ThreadRepository {
 
     const threadDetails = {
       ...threadResult.rows[0],
-      comments: threadCommentsResult.rows.map((val, idx)=>{
+      comments: threadCommentsResult.rows.map((val)=>{
         if (val.is_deleted) {
           val.content = '**komentar telah dihapus**';
         }

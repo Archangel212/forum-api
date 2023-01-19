@@ -22,7 +22,6 @@ describe('ThreadRepositoryPostgres', () => {
         title: 'sample-thread',
         body: 'just a sample',
         owner: 'user-123',
-        comments: [],
       };
       const fakeIdGenerator = () => '123';
 
