@@ -5,7 +5,8 @@ class ThreadsHandler {
   }
 
   async postThread(request, h) {
-    const {title,body} = request.payload;
+    await this._container.UserAuthorizationUseCase.execute(request.auth.credentials);
+    await this._container.ThreadUseCases.addThread(request.payload);
   }
 }
 

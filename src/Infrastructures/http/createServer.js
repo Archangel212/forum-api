@@ -3,6 +3,8 @@ const ClientError = require('../../Commons/exceptions/ClientError');
 const DomainErrorTranslator = require('../../Commons/exceptions/DomainErrorTranslator');
 const users = require('../../Interfaces/http/api/users');
 const authentications = require('../../Interfaces/http/api/authentications');
+const threads = require('../../Interfaces/http/api/threads');
+const hapiAuthJwt = require('@hapi/jwt');
 
 const createServer = async (container) => {
   const server = Hapi.server({
@@ -10,20 +12,41 @@ const createServer = async (container) => {
     port: process.env.PORT,
   });
 
+  await server.register(hapiAuthJwt);
+
+  server.auth.strategy('forum_api_jwt', 'jwt', {
+    keys: process.env.ACCESS_TOKEY_KEY,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: 14400,
+    },
+    validate: (artifacts, request) => {
+      return {
+        isValid: true,
+        credentials: {username: artifacts.decoded.payload.username, id: artifacts.decoded.payload.id},
+      };
+    },
+  });
   await server.register([
     {
       plugin: users,
-      options: { container },
+      options: {container},
     },
     {
       plugin: authentications,
-      options: { container },
+      options: {container},
+    },
+    {
+      plugin: threads,
+      options: {container},
     },
   ]);
 
   server.ext('onPreResponse', (request, h) => {
     // mendapatkan konteks response dari request
-    const { response } = request;
+    const {response} = request;
 
     if (response instanceof Error) {
       // bila response tersebut error, tangani sesuai kebutuhan
