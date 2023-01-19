@@ -5,8 +5,7 @@ class ThreadUseCases {
   }
 
   async addThread(useCasePayload) {
-    const {title, body, owner} = useCasePayload;
-    return await this._threadRepository.addThread({title, body, owner});
+    return await this._threadRepository.addThread(useCasePayload);
   }
 
   async getThreadDetails(useCasePayload) {
