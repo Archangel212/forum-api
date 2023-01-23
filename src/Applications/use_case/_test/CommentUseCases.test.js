@@ -30,6 +30,28 @@ describe('CommentUseCases', ()=>{
   });
 
   describe('softDeleteComment use case', ()=>{
+    it('should throw an error if the usecase does not contain needed payload', async ()=>{
+      const useCasePayload = {};
+
+      const commentUseCases = new CommentUseCases({});
+
+      await expect(commentUseCases.softDeleteComment(useCasePayload))
+          .rejects
+          .toThrowError('COMMENT_USECASES.NOT_CONTAIN_NEEDED_PAYLOAD');
+    });
+
+    it('should throw an error if the payload data type is not valid', async ()=>{
+      const useCasePayload = {
+        commentId: 123,
+      };
+
+      const commentUseCases = new CommentUseCases({});
+
+      await expect(commentUseCases.softDeleteComment(useCasePayload))
+          .rejects
+          .toThrowError('COMMENT_USECASES.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION');
+    });
+
     it('should orchestrating soft deletion action correctly', async ()=>{
       const useCasePayload = {
         commentId: 'comment-123',

@@ -15,7 +15,7 @@ const createServer = async (container) => {
   await server.register(hapiAuthJwt);
 
   server.auth.strategy('forum_api_jwt', 'jwt', {
-    keys: process.env.ACCESS_TOKEY_KEY,
+    keys: process.env.ACCESS_TOKEN_KEY,
     verify: {
       aud: false,
       iss: false,
@@ -50,7 +50,6 @@ const createServer = async (container) => {
 
     if (response instanceof Error) {
       // bila response tersebut error, tangani sesuai kebutuhan
-      // console.error(response);
       const translatedError = DomainErrorTranslator.translate(response);
 
       // penanganan client error secara internal.

@@ -1,6 +1,7 @@
 const CommentsTableHelper = require('../../../../tests/CommentsTableHelper');
 const ThreadsTableHelper = require('../../../../tests/ThreadsTableHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const pool = require('../../database/postgres/pool');
 const ThreadRepositoryPostgres = require('../ThreadRepositoryPostgres');
 
@@ -53,6 +54,26 @@ describe('ThreadRepositoryPostgres', () => {
       expect(threadDetails).toHaveProperty('username');
       expect(threadDetails).toHaveProperty('comments');
       expect(threadDetails.comments).toBeInstanceOf(Array);
+    });
+  });
+
+  describe('verifyThreadId function', ()=>{
+    it('should throw an error if thread id is not found', async ()=>{
+      const threadId = 'xxx';
+
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+
+      await expect(threadRepositoryPostgres.verifyThreadId(threadId)).rejects.toThrow(NotFoundError);
+    });
+
+    it('should not throw an error if thread id is found', async ()=>{
+      const threadId = 'thread-123';
+      await UsersTableTestHelper.addUser({id: 'user-123'});
+      await ThreadsTableHelper.addThread({id: threadId});
+
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+
+      await expect(threadRepositoryPostgres.verifyThreadId(threadId)).resolves.not.toThrow(NotFoundError);
     });
   });
 });

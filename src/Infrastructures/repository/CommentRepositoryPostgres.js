@@ -1,5 +1,7 @@
 const InvariantError = require('../../Commons/exceptions/InvariantError');
+const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
 const CommentRepository = require('../../Domains/comments/CommentRepository');
+const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 
 class CommentRepositoryPostgres extends CommentRepository {
   constructor(pool, idGenerator) {
@@ -18,21 +20,8 @@ class CommentRepositoryPostgres extends CommentRepository {
 
       return {...result.rows[0]};
     } catch (e) {
-      // console.log(e);
       throw new InvariantError('komentar gagal ditambahkan ke dalam thread');
     }
-  }
-
-  async getCommentById(commentId) {
-    const result = await this._pool.query({
-      text: 'SELECT * FROM comments WHERE comments.id = $1',
-      values: [commentId],
-    });
-
-    if (!result.rowCount) {
-      throw new InvariantError('detail komentar gagal diterima');
-    }
-    return result.rows[0];
   }
 
   async softDeleteComment(commentId) {
@@ -43,6 +32,28 @@ class CommentRepositoryPostgres extends CommentRepository {
 
     if (!result.rowCount) {
       throw new InvariantError('komentar gagal dihapuskan dari dalam thread');
+    }
+  }
+
+  async verifyCommentId(commentId) {
+    const result = await this._pool.query({
+      text: 'SELECT id FROM comments WHERE id = $1',
+      values: [commentId],
+    });
+
+    if (!result.rowCount) {
+      throw new NotFoundError('comment tidak ditemukan');
+    }
+  }
+
+  async verifyCommentResourceAccess(commentId, userId) {
+    const result = await this._pool.query({
+      text: 'SELECT id, owner FROM comments WHERE id = $1 AND owner = $2',
+      values: [commentId, userId],
+    });
+
+    if (!result.rowCount) {
+      throw new AuthorizationError('user tidak terotorisasi');
     }
   }
 }

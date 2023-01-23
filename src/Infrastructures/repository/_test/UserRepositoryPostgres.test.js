@@ -33,6 +33,25 @@ describe('UserRepositoryPostgres', () => {
     });
   });
 
+  describe('verifyUserJwtPayload function', () => {
+    it('should throw InvariantError when id and username do not exist', async () => {
+      // Arrange
+      const userRepositoryPostgres = new UserRepositoryPostgres(pool, {});
+
+      // Action & Assert
+      await expect(userRepositoryPostgres.verifyUserJwtPayload('dicoding', 'user-123')).rejects.toThrowError(InvariantError);
+    });
+
+    it('should not throw InvariantError when id and username do exist', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({id: 'user-123', username: 'dicoding'}); // memasukan user baru dengan username dicoding
+      const userRepositoryPostgres = new UserRepositoryPostgres(pool, {});
+
+      // Action & Assert
+      await expect(userRepositoryPostgres.verifyUserJwtPayload('dicoding', 'user-123')).resolves.not.toThrowError(InvariantError);
+    });
+  });
+
   describe('addUser function', () => {
     it('should persist register user and return registered user correctly', async () => {
       // Arrange

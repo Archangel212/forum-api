@@ -9,23 +9,21 @@ const Jwt = require('@hapi/jwt');
 const pool = require('./database/postgres/pool');
 
 // service (repository, helper, manager, etc)
-const UserRepository = require('../Domains/users/UserRepository');
-const PasswordHash = require('../Applications/security/PasswordHash');
 const UserRepositoryPostgres = require('./repository/UserRepositoryPostgres');
 const BcryptPasswordHash = require('./security/BcryptPasswordHash');
 
 // use case
 const AddUserUseCase = require('../Applications/use_case/AddUserUseCase');
-const AuthenticationTokenManager = require('../Applications/security/AuthenticationTokenManager');
 const JwtTokenManager = require('./security/JwtTokenManager');
 const LoginUserUseCase = require('../Applications/use_case/LoginUserUseCase');
-const AuthenticationRepository = require('../Domains/authentications/AuthenticationRepository');
 const AuthenticationRepositoryPostgres = require('./repository/AuthenticationRepositoryPostgres');
 const LogoutUserUseCase = require('../Applications/use_case/LogoutUserUseCase');
 const RefreshAuthenticationUseCase = require('../Applications/use_case/RefreshAuthenticationUseCase');
 const ThreadUseCases = require('../Applications/use_case/ThreadUseCases');
-const UserAuthorizationUseCase = require('../Applications/use_case/UserAuthorizationUseCase');
-const JwtAuthorizationTokenManager = require('./security/JwtAuthorizationTokenManager');
+const VerifyUserAuthorizationUseCase = require('../Applications/use_case/VerifyUserAuthorizationUseCase');
+const ThreadRepositoryPostgres = require('./repository/ThreadRepositoryPostgres');
+const CommentRepositoryPostgres = require('./repository/CommentRepositoryPostgres');
+const CommentUseCases = require('../Applications/use_case/CommentUseCases');
 
 // creating container
 const container = awilix.createContainer();
@@ -40,9 +38,10 @@ container.register({
 container.register({
   userRepository: awilix.asClass(UserRepositoryPostgres).classic(),
   authenticationRepository: awilix.asClass(AuthenticationRepositoryPostgres).classic(),
+  threadRepository: awilix.asClass(ThreadRepositoryPostgres).classic(),
+  commentRepository: awilix.asClass(CommentRepositoryPostgres).classic(),
   passwordHash: awilix.asClass(BcryptPasswordHash).classic(),
   authenticationTokenManager: awilix.asClass(JwtTokenManager).classic(),
-  authorizationTokenManager: awilix.asClass(JwtAuthorizationTokenManager).classic(),
 });
 
 // registering use cases
@@ -51,8 +50,9 @@ container.register({
   LoginUserUseCase: awilix.asClass(LoginUserUseCase),
   LogoutUserUseCase: awilix.asClass(LogoutUserUseCase),
   RefreshAuthenticationUseCase: awilix.asClass(RefreshAuthenticationUseCase),
-  UserAuthorizationUseCase: awilix.asClass(UserAuthorizationUseCase),
+  VerifyUserAuthorizationUseCase: awilix.asClass(VerifyUserAuthorizationUseCase),
   ThreadUseCases: awilix.asClass(ThreadUseCases),
+  CommentUseCases: awilix.asClass(CommentUseCases),
 });
 
 module.exports = container;

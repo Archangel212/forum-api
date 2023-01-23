@@ -3,18 +3,23 @@ class Comment {
   constructor(payload) {
     this._verifyPayload(payload);
 
-    this._title = payload.title;
-    this._body = payload.body;
-    this._owner = payload.owner;
-    this._comments = payload.comments;
+    this.content = payload.content;
+    this.date = payload.date;
+    this.owner = payload.owner;
+    this.isDeleted = payload.isDeleted;
+    this.threadId = payload.threadId;
   }
 
   _verifyPayload(payload) {
-    const {title, body, owner, comments} = payload;
+    const {content, date, owner, isDeleted, threadId} = payload;
 
-    if (!title || !body || !owner || (typeof comments === 'undefined' || !Array.isArray(comments))) {
+    if (!content || !date || !owner || isDeleted === undefined || !threadId) {
+      throw new Error('COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
+    }
 
-      throw new Error('THREAD.NOT_CONTAIN_NEEDED_PROPERTY');
+    if (typeof content !== 'string' || !(date instanceof Date) || typeof owner !== 'string' ||
+    typeof isDeleted !== 'boolean' || typeof threadId != 'string') {
+      throw new Error('COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
   }
 }

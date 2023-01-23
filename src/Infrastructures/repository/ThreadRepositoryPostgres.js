@@ -1,5 +1,5 @@
 const InvariantError = require('../../Commons/exceptions/InvariantError');
-const Thread = require('../../Domains/threads/entities/Thread');
+const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 const ThreadRepository = require('../../Domains/threads/ThreadRepository');
 
 class ThreadRepositoryPostgres extends ThreadRepository {
@@ -26,7 +26,7 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     }
 
 
-    return new Thread({...result.rows[0], body});
+    return {...result.rows[0]};
   }
 
   async getThreadDetails(threadId) {
@@ -65,9 +65,18 @@ class ThreadRepositoryPostgres extends ThreadRepository {
         return val;
       }),
     };
-
-    console.log('getThreadDetails threadDetails', threadDetails);
     return threadDetails;
+  }
+
+  async verifyThreadId(threadId) {
+    const result = await this._pool.query({
+      text: 'SELECT id FROM threads WHERE id = $1',
+      values: [threadId],
+    });
+
+    if (!result.rowCount) {
+      throw new NotFoundError('thread id tidak ditemukan');
+    }
   }
 }
 

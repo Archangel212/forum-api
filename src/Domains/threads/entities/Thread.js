@@ -3,18 +3,20 @@ class Thread {
   constructor(payload) {
     this._verifyPayload(payload);
 
-    this._title = payload.title;
-    this._body = payload.body;
-    this._owner = payload.owner;
+    this.title = payload.title;
+    this.body = payload.body;
+    this.owner = payload.owner;
   }
 
   _verifyPayload(payload) {
-    const {title, body, owner, comments} = payload;
+    const {title, body, owner} = payload;
 
     if (!title || !body || !owner) {
-      console.log('destructrued fucked result ', {title, body, owner, comments});
-
       throw new Error('THREAD.NOT_CONTAIN_NEEDED_PROPERTY');
+    }
+
+    if (typeof title !== 'string' || typeof body !== 'string' || typeof owner !== 'string') {
+      throw new Error('THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
   }
 }

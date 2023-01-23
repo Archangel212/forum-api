@@ -22,6 +22,19 @@ class UserRepositoryPostgres extends UserRepository {
     }
   }
 
+  async verifyUserJwtPayload(username, id) {
+    const query = {
+      text: 'SELECT id,username FROM users WHERE id = $1 AND username = $2',
+      values: [id, username],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new InvariantError('user jwt payload tidak terverifikasi');
+    }
+  }
+
   async addUser(registerUser) {
     const {username, password, fullname} = registerUser;
     const id = `user-${this._idGenerator()}`;
