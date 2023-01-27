@@ -14,7 +14,21 @@ class ThreadUseCases {
   async getThreadDetails(useCasePayload) {
     this._validateGetThreadDetailsPayload(useCasePayload);
     const {threadId} = useCasePayload;
-    const threadDetails = await this._threadRepository.getThreadDetails(threadId);
+
+    const thread = await this._threadRepository.getThreadById(threadId);
+    const threadComments = await this._threadRepository.getThreadComments(threadId);
+
+    const threadDetails = {
+      ...thread,
+      comments: threadComments.map((comment)=>{
+        if (comment.is_deleted) {
+          comment.content = '**komentar telah dihapus**';
+        }
+        delete comment.is_deleted;
+        return comment;
+      }),
+    };
+
     return threadDetails;
   }
 

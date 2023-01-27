@@ -11,17 +11,16 @@ class CommentRepositoryPostgres extends CommentRepository {
   }
 
   async addCommentToThread({content, date, owner, isDeleted, threadId}) {
-    try {
-      const id = `comment-${this._idGenerator()}`;
-      const result = await this._pool.query({
-        text: 'INSERT INTO comments(id, content, date, owner, is_deleted, thread_id) VALUES($1, $2, $3, $4, $5, $6) RETURNING id, content, owner',
-        values: [id, content, date, owner, isDeleted, threadId],
-      });
+    const id = `comment-${this._idGenerator()}`;
+    const result = await this._pool.query({
+      text: 'INSERT INTO comments(id, content, date, owner, is_deleted, thread_id) VALUES($1, $2, $3, $4, $5, $6) RETURNING id, content, owner',
+      values: [id, content, date, owner, isDeleted, threadId],
+    });
 
-      return {...result.rows[0]};
-    } catch (e) {
+    if (!result.rowCount) {
       throw new InvariantError('komentar gagal ditambahkan ke dalam thread');
     }
+    return {...result.rows[0]};
   }
 
   async softDeleteComment(commentId) {

@@ -68,26 +68,36 @@ describe('ThreadUsecases', ()=>{
       const useCasePayload = {
         threadId: 'thread-123',
       };
-      const expectedThreadDetails = {
+      const thread = {
         id: 'thread-123',
         title: 'thread title',
         body: 'thread body',
         date: new Date(),
-        username: 'user-123',
-        comments: [
-          {
-            id: 'comment-123',
-            username: 'dicoding',
-            date: new Date(),
-            content: 'just a dicoding comment',
-          },
-          {
-            id: 'comment-456',
-            username: 'ujang',
-            date: new Date(),
-            content: 'just a ujang comment',
-          },
-        ],
+        username: 'dicoding',
+      };
+      const threadComments = [
+        {
+          id: 'comment-123',
+          username: 'dicoding',
+          date: new Date(),
+          content: 'just a dicoding comment',
+        },
+        {
+          id: 'comment-456',
+          username: 'ujang',
+          date: new Date(),
+          content: 'just a ujang comment',
+        },
+      ];
+      const expectedThreadDetails = {
+        ...thread,
+        comments: threadComments.map((comment)=>{
+          if (comment.is_deleted) {
+            comment.content = '**komentar telah dihapus**';
+          }
+          delete comment.is_deleted;
+          return comment;
+        }),
       };
 
       const mockedThreadRepository = new ThreadRepository();
@@ -95,11 +105,13 @@ describe('ThreadUsecases', ()=>{
         threadRepository: mockedThreadRepository,
       });
 
-      mockedThreadRepository.getThreadDetails = jest.fn().mockResolvedValue(expectedThreadDetails);
+      mockedThreadRepository.getThreadById = jest.fn().mockResolvedValue(thread);
+      mockedThreadRepository.getThreadComments = jest.fn().mockResolvedValue(threadComments);
       const threadDetails = await mockedThreadUseCase.getThreadDetails(useCasePayload);
 
       expect(threadDetails).toStrictEqual(expectedThreadDetails);
-      expect(mockedThreadRepository.getThreadDetails).toBeCalledWith(useCasePayload.threadId);
+      expect(mockedThreadRepository.getThreadById).toBeCalledWith(useCasePayload.threadId);
+      expect(mockedThreadRepository.getThreadComments).toBeCalledWith(useCasePayload.threadId);
     });
   });
 });

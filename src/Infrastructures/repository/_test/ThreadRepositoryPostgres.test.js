@@ -2,6 +2,7 @@ const CommentsTableHelper = require('../../../../tests/CommentsTableHelper');
 const ThreadsTableHelper = require('../../../../tests/ThreadsTableHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
+const InvariantError = require('../../../Commons/exceptions/InvariantError');
 const pool = require('../../database/postgres/pool');
 const ThreadRepositoryPostgres = require('../ThreadRepositoryPostgres');
 
@@ -35,42 +36,84 @@ describe('ThreadRepositoryPostgres', () => {
   });
 
   describe('getThreadById function', ()=>{
+    it('should throw an error if threadId is invalid', async ()=>{
+      const threadId = 'xxx';
+
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+
+      await expect(threadRepositoryPostgres.getThreadById(threadId)).rejects.toThrow(InvariantError);
+    });
+
     it('should return thread correctly', async ()=>{
+      const threadDate = new Date();
+
       await UsersTableTestHelper.addUser({id: 'user-123'});
+      await ThreadsTableHelper.addThread({id: 'thread-123', title: 'thread title', body: 'thread body', date: threadDate});
       const fakeIdGenerator = () => '123';
+
+      const expectedThread = {
+        id: 'thread-123',
+        title: 'thread title',
+        body: 'thread body',
+        date: threadDate,
+        username: 'dicoding',
+      };
 
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
       const thread = await threadRepositoryPostgres.getThreadById('thread-123');
 
-      expect(threadDetails).toHaveProperty('ids');
-      expect(threadDetails).toHaveProperty('title');
-      expect(threadDetails).toHaveProperty('body');
-      expect(threadDetails).toHaveProperty('date');
-      expect(threadDetails).toHaveProperty('username');
-      expect(threadDetails).toHaveProperty('comments');
-      expect(threadDetails.comments).toBeInstanceOf(Array);
+      expect(thread).toStrictEqual(expectedThread);
     });
   });
-  describe('getThreadDetails function', ()=>{
-    it('should return thread details correctly', async ()=>{
+
+  describe('getThreadComments function', ()=>{
+    it('should return empty array if thread doenst have any comments', async ()=>{
       await UsersTableTestHelper.addUser({id: 'user-123'});
       await ThreadsTableHelper.addThread({id: 'thread-123'});
-      await CommentsTableHelper.addComment({id: 'comment-123'});
+
+      const expectedThreadComments = [];
+
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+      const threadComments = await threadRepositoryPostgres.getThreadComments('thread-123');
+
+      expect(threadComments).toBeInstanceOf(Array);
+      expect(threadComments).toStrictEqual(expectedThreadComments);
+    });
+
+    it('should return thread comments correctly', async ()=>{
+      const dicodingCommentDate = new Date();
+      const ujangCommentDate = new Date();
+
+      await UsersTableTestHelper.addUser({id: 'user-123'});
+      await ThreadsTableHelper.addThread({id: 'thread-123'});
+      await CommentsTableHelper.addComment({id: 'comment-123', content: 'just a dicoding comment', date: dicodingCommentDate});
       const fakeIdGenerator = () => '123';
 
       await UsersTableTestHelper.addUser({id: 'user-456', username: 'ujang'});
-      await CommentsTableHelper.addComment({id: 'comment-456', content: 'another comment', isDeleted: true, owner: 'user-456'});
+      await CommentsTableHelper.addComment({id: 'comment-456', content: 'just a ujang comment', date: ujangCommentDate, isDeleted: true, owner: 'user-456'});
+
+      const expectedThreadComments = [
+        {
+          id: 'comment-123',
+          username: 'dicoding',
+          date: dicodingCommentDate,
+          content: 'just a dicoding comment',
+          is_deleted: false,
+        },
+        {
+          id: 'comment-456',
+          username: 'ujang',
+          date: ujangCommentDate,
+          content: 'just a ujang comment',
+          is_deleted: true,
+        },
+      ];
 
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
-      const threadDetails = await threadRepositoryPostgres.getThreadDetails('thread-123');
+      const threadComments = await threadRepositoryPostgres.getThreadComments('thread-123');
 
-      expect(threadDetails).toHaveProperty('id');
-      expect(threadDetails).toHaveProperty('title');
-      expect(threadDetails).toHaveProperty('body');
-      expect(threadDetails).toHaveProperty('date');
-      expect(threadDetails).toHaveProperty('username');
-      expect(threadDetails).toHaveProperty('comments');
-      expect(threadDetails.comments).toBeInstanceOf(Array);
+      expect(threadComments).toBeInstanceOf(Array);
+      expect(threadComments).toStrictEqual(expectedThreadComments);
     });
   });
 

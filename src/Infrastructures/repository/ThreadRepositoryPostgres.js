@@ -21,29 +21,10 @@ class ThreadRepositoryPostgres extends ThreadRepository {
 
     const result = await this._pool.query(query);
 
-    if (!result.rowCount) {
-      throw new InvariantError('gagal menambah thread');
-    }
-
-
     return {...result.rows[0]};
   }
 
-
   async getThreadById(threadId) {
-    const result = await this._pool.query({
-      text: 'SELECT id, title, body, date_created AS date FROM threads WHERE id = $1',
-      values: [threadId],
-    });
-
-    if (!result.rowCount) {
-      throw new InvariantError('thread tidak ditemukan');
-    }
-
-    return result.rows[0];
-  }
-
-  async getThreadDetails(threadId) {
     const threadResult = await this._pool.query({
       text: `SELECT t.id, t.title, t.body, t.date_created AS date, u.username 
             FROM threads t
@@ -56,6 +37,10 @@ class ThreadRepositoryPostgres extends ThreadRepository {
       throw new InvariantError('thread tidak ditemukan');
     }
 
+    return threadResult.rows[0];
+  }
+
+  async getThreadComments(threadId) {
     const threadCommentsResult = await this._pool.query({
       text: `SELECT c.id, u.username, c.date, c.content, c.is_deleted FROM comments c
             INNER JOIN threads t ON c.thread_id = t.id 
@@ -66,20 +51,11 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     });
 
     if (!threadCommentsResult.rowCount) {
-      throw new InvariantError('thread comments tidak ditemukan');
+      // thread doesn't have any comments
+      return [];
     }
 
-    const threadDetails = {
-      ...threadResult.rows[0],
-      comments: threadCommentsResult.rows.map((val)=>{
-        if (val.is_deleted) {
-          val.content = '**komentar telah dihapus**';
-        }
-        delete val.is_deleted;
-        return val;
-      }),
-    };
-    return threadDetails;
+    return threadCommentsResult.rows;
   }
 
   async verifyThreadId(threadId) {
