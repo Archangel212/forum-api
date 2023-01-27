@@ -1,5 +1,6 @@
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const ThreadUseCases = require('../ThreadUseCases');
+const VerifyUserAuthorizationUseCase = require('../VerifyUserAuthorizationUseCase');
 
 describe('ThreadUsecases', ()=>{
   describe('addThread usecase', ()=>{
@@ -7,6 +8,7 @@ describe('ThreadUsecases', ()=>{
       const useCasePayload = {
         title: 'simple thread',
         body: 'just a thread',
+        ownerUsername: 'dicoding',
         owner: 'user-123',
       };
       const expectedAddedThread = {
@@ -20,11 +22,22 @@ describe('ThreadUsecases', ()=>{
         threadRepository: mockedThreadRepository,
       });
 
+      const mockedVerifyUserAuthorizationUseCase = new VerifyUserAuthorizationUseCase({});
+      mockedVerifyUserAuthorizationUseCase.verifyThreadResourceAccess = jest.fn().mockResolvedValue();
+
       mockedThreadRepository.addThread = jest.fn().mockResolvedValue(expectedAddedThread);
-      const addedThread = await mockedThreadUseCase.addThread(useCasePayload);
+      const addedThread = await mockedThreadUseCase.addThread(useCasePayload, mockedVerifyUserAuthorizationUseCase);
 
       expect(addedThread).toStrictEqual(expectedAddedThread);
-      expect(mockedThreadRepository.addThread).toBeCalledWith(useCasePayload);
+      expect(mockedVerifyUserAuthorizationUseCase.verifyThreadResourceAccess).toBeCalledWith({
+        username: useCasePayload.ownerUsername, id: useCasePayload.owner,
+      });
+      expect(mockedThreadRepository.addThread).toBeCalledWith({
+        title: 'simple thread',
+        body: 'just a thread',
+        owner: 'user-123',
+
+      });
     });
   });
 

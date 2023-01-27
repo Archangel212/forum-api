@@ -23,4 +23,22 @@ describe('Thread entities', ()=>{
     // Action and Assert
     expect(() => new Thread(payload)).toThrowError('THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION');
   });
+
+  it('should create thread entities correctly', () => {
+    // Arrange
+    const payload = {
+      title: 'just a title',
+      body: 'a thread body',
+      owner: 'user-123',
+    };
+
+    // Action
+    const thread = new Thread(payload);
+
+    // Assert
+    expect(thread).toBeInstanceOf(Thread);
+    expect(thread.content).toEqual(payload.content);
+    expect(thread.date).toEqual(payload.date);
+    expect(thread.owner).toEqual(payload.owner);
+  });
 });

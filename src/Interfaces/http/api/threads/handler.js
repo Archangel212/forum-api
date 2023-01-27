@@ -10,10 +10,11 @@ class ThreadsHandler {
   }
 
   async postThread(request, h) {
-    await this._container.resolve('VerifyUserAuthorizationUseCase')
-        .verifyThreadResourceAccess({...request.auth.credentials});
+    const addedThread = await this._container.resolve('ThreadUseCases').addThread({
+      ...request.payload, ownerUsername: request.auth.credentials.username, owner: request.auth.credentials.id},
+    await this._container.resolve('VerifyUserAuthorizationUseCase',
+    ));
 
-    const addedThread = await this._container.resolve('ThreadUseCases').addThread({...request.payload, owner: request.auth.credentials.id});
     return h.response({
       status: 'success',
       data: {
@@ -23,15 +24,14 @@ class ThreadsHandler {
   }
 
   async addCommentToThread(request, h) {
-    await this._container.resolve('VerifyUserAuthorizationUseCase').verifyThreadResourceAccess({...request.auth.credentials, threadId: request.params.threadId});
-
     const addedComment = await this._container.resolve('CommentUseCases').addCommentToThread({
       content: request.payload.content,
       date: new Date(),
+      ownerUsername: request.auth.credentials.username,
       owner: request.auth.credentials.id,
       isDeleted: false,
       threadId: request.params.threadId,
-    });
+    }, await this._container.resolve('VerifyUserAuthorizationUseCase'));
 
     return h.response({
       status: 'success',
@@ -41,7 +41,7 @@ class ThreadsHandler {
     }).code(201);
   }
 
-  async getThreadDetails(request, h) {
+  async getThreadDetails(request) {
     const threadDetails = await this._container.resolve('ThreadUseCases').getThreadDetails(request.params);
     return {
       status: 'success',
@@ -51,13 +51,16 @@ class ThreadsHandler {
     };
   }
 
-  async deleteCommentInAThread(request, h) {
-    await this._container.resolve('VerifyUserAuthorizationUseCase').verifyThreadResourceAccess({...request.auth.credentials, threadId: request.params.threadId});
-    await this._container.resolve('VerifyUserAuthorizationUseCase').verifyCommentResourceAccess({
-      commentId: request.params.commentId,
+  async deleteCommentInAThread(request) {
+    const commentUseCases = await this._container.resolve('CommentUseCases');
+
+    await commentUseCases.softDeleteComment({
+      username: request.auth.credentials.username,
       userId: request.auth.credentials.id,
-    });
-    await this._container.resolve('CommentUseCases').softDeleteComment(request.params);
+      threadId: request.params.threadId,
+      commentId: request.params.commentId,
+    }, await this._container.resolve('VerifyUserAuthorizationUseCase'));
+
     return {
       status: 'success',
       message: 'komentar berhasil di hapus',

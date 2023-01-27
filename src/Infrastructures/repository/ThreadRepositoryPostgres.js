@@ -29,6 +29,20 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     return {...result.rows[0]};
   }
 
+
+  async getThreadById(threadId) {
+    const result = await this._pool.query({
+      text: 'SELECT id, title, body, date_created AS date FROM threads WHERE id = $1',
+      values: [threadId],
+    });
+
+    if (!result.rowCount) {
+      throw new InvariantError('thread tidak ditemukan');
+    }
+
+    return result.rows[0];
+  }
+
   async getThreadDetails(threadId) {
     const threadResult = await this._pool.query({
       text: `SELECT t.id, t.title, t.body, t.date_created AS date, u.username 

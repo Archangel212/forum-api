@@ -34,6 +34,23 @@ describe('ThreadRepositoryPostgres', () => {
     });
   });
 
+  describe('getThreadById function', ()=>{
+    it('should return thread correctly', async ()=>{
+      await UsersTableTestHelper.addUser({id: 'user-123'});
+      const fakeIdGenerator = () => '123';
+
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
+      const thread = await threadRepositoryPostgres.getThreadById('thread-123');
+
+      expect(threadDetails).toHaveProperty('ids');
+      expect(threadDetails).toHaveProperty('title');
+      expect(threadDetails).toHaveProperty('body');
+      expect(threadDetails).toHaveProperty('date');
+      expect(threadDetails).toHaveProperty('username');
+      expect(threadDetails).toHaveProperty('comments');
+      expect(threadDetails.comments).toBeInstanceOf(Array);
+    });
+  });
   describe('getThreadDetails function', ()=>{
     it('should return thread details correctly', async ()=>{
       await UsersTableTestHelper.addUser({id: 'user-123'});

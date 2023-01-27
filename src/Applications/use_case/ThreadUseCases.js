@@ -5,8 +5,9 @@ class ThreadUseCases {
     this._threadRepository = threadRepository;
   }
 
-  async addThread(useCasePayload) {
+  async addThread(useCasePayload, verifyUserAuthorizationUseCase) {
     const thread = new Thread(useCasePayload);
+    await verifyUserAuthorizationUseCase.verifyThreadResourceAccess({username: useCasePayload.ownerUsername, id: thread.owner});
     return await this._threadRepository.addThread(thread);
   }
 
