@@ -1,27 +1,30 @@
 
 const Comment = require('../../Domains/comments/entities/Comment');
 class CommentUseCases {
-  constructor({commentRepository}) {
+  constructor({commentRepository, threadRepository}) {
     this._commentRepository = commentRepository;
+    this._threadRepository = threadRepository;
   }
 
-  async addCommentToThread(useCasePayload, verifyUserAuthorizationUseCase) {
+  async addCommentToThread(useCasePayload) {
     const comment = new Comment(useCasePayload);
     const {owner, threadId} = comment;
 
-    await verifyUserAuthorizationUseCase.verifyThreadResourceAccess({username: useCasePayload.ownerUsername, id: owner, threadId});
+    await this._threadRepository.verifyThreadId(threadId);
     return await this._commentRepository.addCommentToThread(comment);
   }
 
-  async softDeleteComment(useCasePayload, verifyUserAuthorizationUseCase) {
+  async softDeleteComment(useCasePayload) {
     this._validateSoftDeleteCommentPayload(useCasePayload);
     const {username, userId, threadId, commentId} = useCasePayload;
 
-    await verifyUserAuthorizationUseCase.verifyThreadResourceAccess({username, id: userId, threadId});
-    await verifyUserAuthorizationUseCase.verifyCommentResourceAccess({
-      commentId,
-      userId,
-    });
+    await this._threadRepository.verifyThreadId(threadId);
+    await this._commentRepository.verifyCommentId(commentId);
+    await this._commentRepository.verifyCommentResourceAccess(commentId, userId);
+    // await verifyUserAuthorizationUseCase.verifyCommentResourceAccess({
+    //   commentId,
+    //   userId,
+    // });
     await this._commentRepository.softDeleteComment(commentId);
   }
 

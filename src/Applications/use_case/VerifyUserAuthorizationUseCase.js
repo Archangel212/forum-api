@@ -12,7 +12,7 @@ class VerifyUserAuthorizationUseCase {
 
     // if it was addThread use case then ignore verifyThreadId function calling
     threadId && await this._threadRepository.verifyThreadId(threadId);
-    await this._userRepository.verifyUserJwtPayload(username, id);
+    // await this._userRepository.verifyUserJwtPayload(username, id);
   }
 
   async verifyCommentResourceAccess(useCasePayload) {

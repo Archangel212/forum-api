@@ -1,6 +1,7 @@
 const CommentRepository = require('../../../Domains/comments/CommentRepository');
+const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const CommentUseCases = require('../CommentUseCases');
-const VerifyUserAuthorizationUseCase = require('../VerifyUserAuthorizationUseCase');
+// const VerifyUserAuthorizationUseCase = require('../VerifyUserAuthorizationUseCase');
 
 describe('CommentUseCases', ()=>{
   describe('addCommentToThread use case', ()=>{
@@ -22,17 +23,19 @@ describe('CommentUseCases', ()=>{
       };
 
       const mockedCommentRepository = new CommentRepository();
+      const mockedThreadRepository = new ThreadRepository();
 
-      const mockedVerifyUserAuthorizationUseCase = new VerifyUserAuthorizationUseCase({});
-      mockedVerifyUserAuthorizationUseCase.verifyThreadResourceAccess = jest.fn().mockResolvedValue();
+      // const mockedVerifyUserAuthorizationUseCase = new VerifyUserAuthorizationUseCase({});
+      // mockedVerifyUserAuthorizationUseCase.verifyThreadResourceAccess = jest.fn().mockResolvedValue();
 
-      const commentUseCases = new CommentUseCases({commentRepository: mockedCommentRepository});
+      const commentUseCases = new CommentUseCases({commentRepository: mockedCommentRepository, threadRepository: mockedCommentRepository});
       mockedCommentRepository.addCommentToThread = jest.fn().mockResolvedValue(expectedAddedComment);
+      mockedThreadRepository.verifyThreadId = jest.fn().mockResolvedValue();
 
-      const addedComment = await commentUseCases.addCommentToThread(useCasePayload, mockedVerifyUserAuthorizationUseCase);
+      const addedComment = await commentUseCases.addCommentToThread(useCasePayload);
 
       expect(addedComment).toStrictEqual(expectedAddedComment);
-      expect(mockedVerifyUserAuthorizationUseCase.verifyThreadResourceAccess).toBeCalledWith({username: useCasePayload.ownerUsername, id: useCasePayload.owner, threadId: useCasePayload.threadId});
+      expect(mockedThreadRepository.verifyThreadId).toBeCalledWith('thread-123');
       expect(mockedCommentRepository.addCommentToThread).toBeCalledWith({
         content: 'just a comment',
         date,
@@ -75,22 +78,21 @@ describe('CommentUseCases', ()=>{
       };
 
       const mockedCommentRepository = new CommentRepository();
+      const mockedThreadRepository = new ThreadRepository();
 
-      const mockedVerifyUserAuthorizationUseCase = new VerifyUserAuthorizationUseCase({});
-      mockedVerifyUserAuthorizationUseCase.verifyThreadResourceAccess = jest.fn().mockResolvedValue();
-      mockedVerifyUserAuthorizationUseCase.verifyCommentResourceAccess = jest.fn().mockResolvedValue();
+      // const mockedVerifyUserAuthorizationUseCase = new VerifyUserAuthorizationUseCase({});
+      mockedThreadRepository.verifyThreadId = jest.fn().mockResolvedValue();
+      mockedCommentRepository.verifyCommentId = jest.fn().mockResolvedValue();
+      mockedCommentRepository.verifyCommentResourceAccess = jest.fn().mockResolvedValue();
 
-      const commentUseCases = new CommentUseCases({commentRepository: mockedCommentRepository});
+      const commentUseCases = new CommentUseCases({commentRepository: mockedCommentRepository, threadRepository: mockedThreadRepository});
       mockedCommentRepository.softDeleteComment = jest.fn().mockResolvedValue();
 
-      await commentUseCases.softDeleteComment(useCasePayload, mockedVerifyUserAuthorizationUseCase);
+      await commentUseCases.softDeleteComment(useCasePayload);
 
-      expect(mockedVerifyUserAuthorizationUseCase.verifyThreadResourceAccess).toBeCalledWith({
-        username: useCasePayload.username, id: useCasePayload.userId, threadId: useCasePayload.threadId});
-      expect(mockedVerifyUserAuthorizationUseCase.verifyCommentResourceAccess).toBeCalledWith({
-        commentId: useCasePayload.commentId,
-        userId: useCasePayload.userId,
-      });
+      expect(mockedThreadRepository.verifyThreadId).toBeCalledWith('thread-123');
+      expect(mockedCommentRepository.verifyCommentId).toBeCalledWith('comment-123');
+      expect(mockedCommentRepository.verifyCommentResourceAccess).toBeCalledWith('comment-123', 'user-123');
       expect(mockedCommentRepository.softDeleteComment).toBeCalledWith(useCasePayload.commentId);
     });
   });

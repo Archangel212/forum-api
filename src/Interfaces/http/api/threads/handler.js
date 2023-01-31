@@ -11,9 +11,7 @@ class ThreadsHandler {
 
   async postThread(request, h) {
     const addedThread = await this._container.resolve('ThreadUseCases').addThread({
-      ...request.payload, ownerUsername: request.auth.credentials.username, owner: request.auth.credentials.id},
-    await this._container.resolve('VerifyUserAuthorizationUseCase',
-    ));
+      ...request.payload, ownerUsername: request.auth.credentials.username, owner: request.auth.credentials.id});
 
     return h.response({
       status: 'success',
@@ -31,7 +29,7 @@ class ThreadsHandler {
       owner: request.auth.credentials.id,
       isDeleted: false,
       threadId: request.params.threadId,
-    }, await this._container.resolve('VerifyUserAuthorizationUseCase'));
+    });
 
     return h.response({
       status: 'success',
@@ -59,7 +57,7 @@ class ThreadsHandler {
       userId: request.auth.credentials.id,
       threadId: request.params.threadId,
       commentId: request.params.commentId,
-    }, await this._container.resolve('VerifyUserAuthorizationUseCase'));
+    });
 
     return {
       status: 'success',

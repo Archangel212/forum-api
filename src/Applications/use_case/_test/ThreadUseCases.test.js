@@ -22,16 +22,10 @@ describe('ThreadUsecases', ()=>{
         threadRepository: mockedThreadRepository,
       });
 
-      const mockedVerifyUserAuthorizationUseCase = new VerifyUserAuthorizationUseCase({});
-      mockedVerifyUserAuthorizationUseCase.verifyThreadResourceAccess = jest.fn().mockResolvedValue();
-
       mockedThreadRepository.addThread = jest.fn().mockResolvedValue(expectedAddedThread);
-      const addedThread = await mockedThreadUseCase.addThread(useCasePayload, mockedVerifyUserAuthorizationUseCase);
+      const addedThread = await mockedThreadUseCase.addThread(useCasePayload);
 
       expect(addedThread).toStrictEqual(expectedAddedThread);
-      expect(mockedVerifyUserAuthorizationUseCase.verifyThreadResourceAccess).toBeCalledWith({
-        username: useCasePayload.ownerUsername, id: useCasePayload.owner,
-      });
       expect(mockedThreadRepository.addThread).toBeCalledWith({
         title: 'simple thread',
         body: 'just a thread',
