@@ -25,10 +25,7 @@ describe('CommentUseCases', ()=>{
       const mockedCommentRepository = new CommentRepository();
       const mockedThreadRepository = new ThreadRepository();
 
-      // const mockedVerifyUserAuthorizationUseCase = new VerifyUserAuthorizationUseCase({});
-      // mockedVerifyUserAuthorizationUseCase.verifyThreadResourceAccess = jest.fn().mockResolvedValue();
-
-      const commentUseCases = new CommentUseCases({commentRepository: mockedCommentRepository, threadRepository: mockedCommentRepository});
+      const commentUseCases = new CommentUseCases({commentRepository: mockedCommentRepository, threadRepository: mockedThreadRepository});
       mockedCommentRepository.addCommentToThread = jest.fn().mockResolvedValue(expectedAddedComment);
       mockedThreadRepository.verifyThreadId = jest.fn().mockResolvedValue();
 

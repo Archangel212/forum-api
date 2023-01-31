@@ -47,6 +47,31 @@ describe('CommentRepositoryPostgres', () => {
 
       expect(addedComment).toEqual(expectedAddedComment);
     });
+
+    it('should return appropriate comment attributes', async ()=>{
+      await UsersTableTestHelper.addUser({id: 'user-123'});
+      await ThreadsTableHelper.addThread({id: 'thread-123'});
+      const date = new Date();
+      const comment = {
+        content: 'sample comment',
+        date,
+        owner: 'user-123',
+        isDeleted: false,
+        threadId: 'thread-123',
+      };
+
+      const expectedAddedComment = {
+        id: 'comment-123',
+        content: 'sample comment',
+        owner: 'user-123',
+      };
+      const fakeIdGenerator = () => '123';
+
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
+      const addedComment = await commentRepositoryPostgres.addCommentToThread(comment);
+
+      expect(addedComment).toStrictEqual(expectedAddedComment);
+    });
   });
 
   describe('softDeleteComment method', ()=>{

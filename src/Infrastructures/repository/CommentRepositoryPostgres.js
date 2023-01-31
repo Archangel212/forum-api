@@ -17,9 +17,6 @@ class CommentRepositoryPostgres extends CommentRepository {
       values: [id, content, date, owner, isDeleted, threadId],
     });
 
-    if (!result.rowCount) {
-      throw new InvariantError('komentar gagal ditambahkan ke dalam thread');
-    }
     return {...result.rows[0]};
   }
 

@@ -33,6 +33,27 @@ describe('ThreadRepositoryPostgres', () => {
       const threads = await ThreadsTableHelper.findThreadsById('thread-123');
       expect(threads).toHaveLength(1);
     });
+
+    it('should return appropriate thread attributes', async ()=>{
+      await UsersTableTestHelper.addUser({id: 'user-123'});
+      const thread = {
+        title: 'sample-thread',
+        body: 'just a sample',
+        owner: 'user-123',
+      };
+      const expectedThread = {
+        id: 'thread-123',
+        title: 'sample-thread',
+        owner: 'user-123',
+      };
+
+      const fakeIdGenerator = () => '123';
+
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
+      const addedThread = await threadRepositoryPostgres.addThread(thread);
+
+      expect(addedThread).toStrictEqual(expectedThread);
+    });
   });
 
   describe('getThreadById function', ()=>{

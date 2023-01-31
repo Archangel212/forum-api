@@ -8,7 +8,7 @@ class CommentUseCases {
 
   async addCommentToThread(useCasePayload) {
     const comment = new Comment(useCasePayload);
-    const {owner, threadId} = comment;
+    const {threadId} = comment;
 
     await this._threadRepository.verifyThreadId(threadId);
     return await this._commentRepository.addCommentToThread(comment);
@@ -16,15 +16,11 @@ class CommentUseCases {
 
   async softDeleteComment(useCasePayload) {
     this._validateSoftDeleteCommentPayload(useCasePayload);
-    const {username, userId, threadId, commentId} = useCasePayload;
+    const {userId, threadId, commentId} = useCasePayload;
 
     await this._threadRepository.verifyThreadId(threadId);
     await this._commentRepository.verifyCommentId(commentId);
     await this._commentRepository.verifyCommentResourceAccess(commentId, userId);
-    // await verifyUserAuthorizationUseCase.verifyCommentResourceAccess({
-    //   commentId,
-    //   userId,
-    // });
     await this._commentRepository.softDeleteComment(commentId);
   }
 

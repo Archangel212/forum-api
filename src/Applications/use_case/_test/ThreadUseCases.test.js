@@ -1,6 +1,5 @@
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const ThreadUseCases = require('../ThreadUseCases');
-const VerifyUserAuthorizationUseCase = require('../VerifyUserAuthorizationUseCase');
 
 describe('ThreadUsecases', ()=>{
   describe('addThread usecase', ()=>{
@@ -80,18 +79,30 @@ describe('ThreadUsecases', ()=>{
           id: 'comment-456',
           username: 'ujang',
           date: new Date(),
-          content: 'just a ujang comment',
+          content: '**komentar telah dihapus**',
         },
       ];
+
       const expectedThreadDetails = {
-        ...thread,
-        comments: threadComments.map((comment)=>{
-          if (comment.is_deleted) {
-            comment.content = '**komentar telah dihapus**';
-          }
-          delete comment.is_deleted;
-          return comment;
-        }),
+        id: 'thread-123',
+        title: 'thread title',
+        body: 'thread body',
+        date: new Date(),
+        username: 'dicoding',
+        comments: [
+          {
+            id: 'comment-123',
+            username: 'dicoding',
+            date: new Date(),
+            content: 'just a dicoding comment',
+          },
+          {
+            id: 'comment-456',
+            username: 'ujang',
+            date: new Date(),
+            content: '**komentar telah dihapus**',
+          },
+        ],
       };
 
       const mockedThreadRepository = new ThreadRepository();
