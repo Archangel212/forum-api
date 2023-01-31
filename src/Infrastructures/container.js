@@ -20,7 +20,6 @@ const AuthenticationRepositoryPostgres = require('./repository/AuthenticationRep
 const LogoutUserUseCase = require('../Applications/use_case/LogoutUserUseCase');
 const RefreshAuthenticationUseCase = require('../Applications/use_case/RefreshAuthenticationUseCase');
 const ThreadUseCases = require('../Applications/use_case/ThreadUseCases');
-// const VerifyUserAuthorizationUseCase = require('../Applications/use_case/VerifyUserAuthorizationUseCase');
 const ThreadRepositoryPostgres = require('./repository/ThreadRepositoryPostgres');
 const CommentRepositoryPostgres = require('./repository/CommentRepositoryPostgres');
 const CommentUseCases = require('../Applications/use_case/CommentUseCases');
@@ -50,7 +49,6 @@ container.register({
   LoginUserUseCase: awilix.asClass(LoginUserUseCase),
   LogoutUserUseCase: awilix.asClass(LogoutUserUseCase),
   RefreshAuthenticationUseCase: awilix.asClass(RefreshAuthenticationUseCase),
-  // VerifyUserAuthorizationUseCase: awilix.asClass(VerifyUserAuthorizationUseCase),
   ThreadUseCases: awilix.asClass(ThreadUseCases),
   CommentUseCases: awilix.asClass(CommentUseCases),
 });

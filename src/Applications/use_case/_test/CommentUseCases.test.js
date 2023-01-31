@@ -1,7 +1,6 @@
 const CommentRepository = require('../../../Domains/comments/CommentRepository');
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const CommentUseCases = require('../CommentUseCases');
-// const VerifyUserAuthorizationUseCase = require('../VerifyUserAuthorizationUseCase');
 
 describe('CommentUseCases', ()=>{
   describe('addCommentToThread use case', ()=>{
@@ -77,7 +76,6 @@ describe('CommentUseCases', ()=>{
       const mockedCommentRepository = new CommentRepository();
       const mockedThreadRepository = new ThreadRepository();
 
-      // const mockedVerifyUserAuthorizationUseCase = new VerifyUserAuthorizationUseCase({});
       mockedThreadRepository.verifyThreadId = jest.fn().mockResolvedValue();
       mockedCommentRepository.verifyCommentId = jest.fn().mockResolvedValue();
       mockedCommentRepository.verifyCommentResourceAccess = jest.fn().mockResolvedValue();
