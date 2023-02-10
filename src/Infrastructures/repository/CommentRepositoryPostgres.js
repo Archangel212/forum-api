@@ -1,4 +1,3 @@
-const InvariantError = require('../../Commons/exceptions/InvariantError');
 const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
 const CommentRepository = require('../../Domains/comments/CommentRepository');
 const NotFoundError = require('../../Commons/exceptions/NotFoundError');
@@ -21,14 +20,10 @@ class CommentRepositoryPostgres extends CommentRepository {
   }
 
   async softDeleteComment(commentId) {
-    const result = await this._pool.query({
+    await this._pool.query({
       text: 'UPDATE comments SET is_deleted = true WHERE id = $1 RETURNING id',
       values: [commentId],
     });
-
-    if (!result.rowCount) {
-      throw new InvariantError('komentar gagal dihapuskan dari dalam thread');
-    }
   }
 
   async verifyCommentId(commentId) {

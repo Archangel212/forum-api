@@ -68,18 +68,24 @@ describe('ThreadUsecases', ()=>{
         date: new Date(),
         username: 'dicoding',
       };
+
+      const dicodingCommentDate = new Date();
+      const ujangCommentDate = new Date();
+
       const threadComments = [
         {
           id: 'comment-123',
           username: 'dicoding',
-          date: new Date(),
+          date: dicodingCommentDate,
           content: 'just a dicoding comment',
+          is_deleted: false,
         },
         {
           id: 'comment-456',
           username: 'ujang',
-          date: new Date(),
-          content: '**komentar telah dihapus**',
+          date: ujangCommentDate,
+          content: 'ujang comment',
+          is_deleted: true,
         },
       ];
 
@@ -93,13 +99,13 @@ describe('ThreadUsecases', ()=>{
           {
             id: 'comment-123',
             username: 'dicoding',
-            date: new Date(),
+            date: dicodingCommentDate,
             content: 'just a dicoding comment',
           },
           {
             id: 'comment-456',
             username: 'ujang',
-            date: new Date(),
+            date: ujangCommentDate,
             content: '**komentar telah dihapus**',
           },
         ],
