@@ -9,9 +9,38 @@ on:
         default: 'Michael'
 
 jobs:
-  greet:
+  test: 
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     steps:
-    - name: Greet
-      run: echo "Hello ${{ github.event.inputs.name }}!"
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{matrix.node-version}}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{matrix.node-version}}
+      - name: Create database and user
+        run: |
+          psql -U postgres -c "CREATE USER developer WITH PASSWORD 'developer212';"
+          psql -U postgres -c "CREATE DATABASE forumapi_test;"
+          psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE forumapi_test TO developer;"
+      - name: npm install migrate and test
+        run: |
+          npm install
 
