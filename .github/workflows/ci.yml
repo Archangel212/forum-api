@@ -39,7 +39,7 @@ jobs:
         run: |
           PGPASSWORD=postgres psql -U postgres -h 127.0.0.1 -c "CREATE DATABASE forumapi_test"
           PGPASSWORD=postgres psql -U postgres -h 127.0.0.1 -c "CREATE USER ${{secrets.PGUSER_TEST}} WITH PASSWORD '${{secrets.PGPASSWORD_TEST}}';"
-          # psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE forumapi_test TO developer;"
+          PGPASSWORD=postgres psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE forumapi_test TO ${{secrets.PGUSER_TEST}};"
       - name: npm install migrate and test
         run: |
           npm install
