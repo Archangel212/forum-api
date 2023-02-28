@@ -37,8 +37,8 @@ jobs:
           node-version: ${{matrix.node-version}}
       - name: Create database and user
         run: |
-          docker exec postgres psql -U postgres -c "CREATE DATABASE forumapi_test"
-          docker exec postgres psql -U postgres -c "CREATE USER developer WITH PASSWORD 'developer212';"
+          sudo -u postgres psql -U postgres -c "CREATE DATABASE forumapi_test"
+          sudo -u postgres psql -U postgres -c "CREATE USER developer WITH PASSWORD 'developer212';"
           # psql -U postgres -c "CREATE DATABASE forumapi_test;"
           # psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE forumapi_test TO developer;"
       - name: npm install migrate and test
