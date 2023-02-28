@@ -38,10 +38,26 @@ jobs:
       - name: Create database and user
         run: |
           PGPASSWORD=postgres psql -U postgres -h 127.0.0.1 -c "CREATE DATABASE forumapi_test"
-          PGPASSWORD=postgres psql -U postgres -h 127.0.0.1 -c "CREATE USER developer WITH PASSWORD 'developer212';"
-          # psql -U postgres -c "CREATE DATABASE forumapi_test;"
+          PGPASSWORD=postgres psql -U postgres -h 127.0.0.1 -c "CREATE USER ${{secrets.PGUSER_TEST}} WITH PASSWORD '${{secrets.PGPASSWORD_TEST}}';"
           # psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE forumapi_test TO developer;"
       - name: npm install migrate and test
         run: |
           npm install
+          npm run migrate up
+          npm run test
+        env:
+          CI: true
+          PGHOST_TEST: ${{secrets.PGHOST_TEST}}
+          PGPORT_TEST: ${{secrets.PGPORT_TEST}}
+          PGDATABASE_TEST: ${{secrets.PGDATABASE_TEST}}
+          PGUSER_TEST: ${{secrets.PGUSER_TEST}}
+          PGPASSWORD_TEST: ${{secrets.PGPASSWORD_TEST}}
+          PGHOST: ${{secrets.PGHOST_TEST}}
+          PGPORT: ${{secrets.PGPORT_TEST}}
+          PGDATABASE: ${{secrets.PGDATABASE_TEST}}
+          PGUSER: ${{secrets.PGUSER_TEST}}
+          PGPASSWORD: ${{secrets.PGPASSWORD_TEST}}
+          ACCESS_TOKEN_KEY: ${{secrets.ACCESS_TOKEN_KEY}}
+          REFRESH_TOKEN_KEY: ${{secrets.REFRESH_TOKEN_KEY}}
+
 
