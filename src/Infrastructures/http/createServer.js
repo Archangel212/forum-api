@@ -6,10 +6,16 @@ const authentications = require('../../Interfaces/http/api/authentications');
 const threads = require('../../Interfaces/http/api/threads');
 const hapiAuthJwt = require('@hapi/jwt');
 
+const fs = require('fs');
+
 const createServer = async (container) => {
   const server = Hapi.server({
     host: process.env.HOST,
     port: process.env.PORT,
+    tls: {
+      key: fs.readFileSync('/etc/letsencrypt/live/hot-jellyfish-98.a276.dcdg.xyz/privkey.pem'),
+      cert: fs.readFileSync('/etc/letsencrypt/live/hot-jellyfish-98.a276.dcdg.xyz/fullchain.pem'),
+    },
   });
 
   await server.register(hapiAuthJwt);
