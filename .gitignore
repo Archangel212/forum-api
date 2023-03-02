@@ -5,3 +5,4 @@ config/database/test.json
 coverage
 forum-api-webserver.pem
 .env
+student-notes.txt

@@ -37,8 +37,8 @@ describe('Thread entities', ()=>{
 
     // Assert
     expect(thread).toBeInstanceOf(Thread);
-    expect(thread.content).toEqual(payload.content);
-    expect(thread.date).toEqual(payload.date);
+    expect(thread.title).toEqual(payload.title);
+    expect(thread.body).toEqual(payload.body);
     expect(thread.owner).toEqual(payload.owner);
   });
 });
