@@ -13,8 +13,8 @@ const createServer = async (container) => {
     host: process.env.HOST,
     port: process.env.PORT,
     tls: {
-      key: fs.readFileSync('/etc/letsencrypt/live/hot-jellyfish-98.a276.dcdg.xyz/privkey.pem'),
-      cert: fs.readFileSync('/etc/letsencrypt/live/hot-jellyfish-98.a276.dcdg.xyz/fullchain.pem'),
+      key: fs.readFileSync(process.env.TLS_KEY_PATH),
+      cert: fs.readFileSync(process.env.TLS_CERT_PATH),
     },
   });
 

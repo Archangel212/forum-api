@@ -1,4 +1,5 @@
 node_modules
+certs
 package-lock.json
 .idea
 config/database/test.json
@@ -6,3 +7,4 @@ coverage
 forum-api-webserver.pem
 .env
 student-notes.txt
+
